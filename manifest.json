@@ -1,0 +1,9 @@
+{
+    "name": "TerminalAliases",
+    "version_number": "0.1.0",
+    "website_url": "",
+    "description": "Define custom terminal command aliases using a simple multiline config. Supports arguments and works with modded commands.",
+    "dependencies": [
+        "BepInEx-BepInExPack-5.4.2100"
+    ]
+}
