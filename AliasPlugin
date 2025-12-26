@@ -173,7 +173,7 @@ namespace Text
 	}
 	internal class init
 	{
-		public static string finishLoaded = "allvei.terminalaliases v0.1.0 has loaded!";
+		public static string finishLoaded = "allvei.terminalaliases has loaded!";
 
 		public static string finishPatch = "Finished patching!";
 	}
@@ -424,7 +424,7 @@ namespace MyMod
 }
 namespace MyFirstMod
 {
-	[BepInPlugin("allvei.terminalaliases", "alias plugin", "0.1.0")]
+	[BepInPlugin("allvei.terminalaliases", "alias plugin", "1.0.0")]
 	[BepInDependency(/*Could not decode attribute arguments.*/)]
 	public class AliasPlugin : BaseUnityPlugin
 	{
@@ -476,7 +476,7 @@ namespace MyFirstMod
 
 		public const string PLUGIN_NAME = "alias plugin";
 
-		public const string PLUGIN_VERSION = "0.1.0";
+		public const string PLUGIN_VERSION = "1.0.0";
 
 		public const string PLUGIN_WEBSITE = "https://github.com/allvei/TerminalAliases";
 
