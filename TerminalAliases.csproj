@@ -11,6 +11,7 @@
 		<DebugType>portable</DebugType>
 		<GameDir Condition="'$(GameDir)' == ''">$(HOME)/.steam/steam/steamapps/common/Lethal Company</GameDir>
 		<ManagedDir>$(GameDir)/Lethal Company_Data/Managed</ManagedDir>
+		<UseLocalGameLibs Condition="Exists('$(ManagedDir)/Assembly-CSharp.dll')">true</UseLocalGameLibs>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -20,7 +21,13 @@
 		<PackageReference Include="UnityEngine.Modules" Version="2022.3.9" IncludeAssets="compile" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<!-- Use NuGet game libs when local game is not installed (CI builds) -->
+	<ItemGroup Condition="'$(UseLocalGameLibs)' != 'true'">
+		<PackageReference Include="LethalCompany.GameLibs.Steam" Version="73.0.0-ngd.0" IncludeAssets="compile" />
+	</ItemGroup>
+
+	<!-- Use local game libs when available (local development) -->
+	<ItemGroup Condition="'$(UseLocalGameLibs)' == 'true'">
 		<Reference Include="Assembly-CSharp">
 			<HintPath>$(ManagedDir)/Assembly-CSharp.dll</HintPath>
 		</Reference>
