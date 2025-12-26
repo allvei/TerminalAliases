@@ -1,6 +1,5 @@
 using HarmonyLib;
-using TMPro;
-using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TerminalAliases.Patches;
 
@@ -9,17 +8,6 @@ internal static class TerminalInputPatch
 {
     private static bool _pendingConfirm;
 
-    [HarmonyPatch("Start")]
-    [HarmonyPostfix]
-    private static void SetMultilineInput(Terminal __instance)
-    {
-        if (__instance.screenText != null)
-        {
-            __instance.screenText.lineType = TMP_InputField.LineType.MultiLineNewline;
-            Plugin.Log.LogDebug("Terminal input set to multiline.");
-        }
-    }
-
     [HarmonyPatch("Update")]
     [HarmonyPostfix]
     private static void HandleCtrlEnter(Terminal __instance)
@@ -27,11 +15,16 @@ internal static class TerminalInputPatch
         if (!__instance.terminalInUse)
             return;
 
-        // Ctrl+Enter to auto-confirm
-        if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) &&
-            Input.GetKeyDown(KeyCode.Return))
+        var keyboard = Keyboard.current;
+        if (keyboard == null)
+            return;
+
+        // Ctrl+Enter to submit and auto-confirm
+        if ((keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed) &&
+            keyboard.enterKey.wasPressedThisFrame)
         {
             _pendingConfirm = true;
+            __instance.OnSubmit();
         }
     }
 
@@ -44,22 +37,38 @@ internal static class TerminalInputPatch
 
         _pendingConfirm = false;
 
-        // Submit "confirm" on the next frame
-        __instance.StartCoroutine(SubmitConfirmCoroutine(__instance));
+        __instance.StartCoroutine(ConfirmCoroutine(__instance));
     }
 
-    private static System.Collections.IEnumerator SubmitConfirmCoroutine(Terminal terminal)
+    private static System.Collections.IEnumerator ConfirmCoroutine(Terminal terminal)
     {
-        yield return null; // Wait one frame for the terminal to process
+        yield return null; // Wait one frame for the terminal to process the command
 
         if (!terminal.terminalInUse)
             yield break;
 
-        // Type and submit "confirm"
-        terminal.screenText.text += "confirm";
-        terminal.textAdded = 7; // Length of "confirm"
-        terminal.OnSubmit();
+        var currentNode = terminal.currentNode;
+        if (currentNode == null)
+            yield break;
 
-        Plugin.Log.LogDebug("Auto-confirmed via Ctrl+Enter.");
+        // TerminalNode.terminalOptions contains compatible keywords
+        // When a confirmation is pending, one of the options will have "confirm" as the word
+        // and point to the result node via terminalOptions[i].result
+        if (currentNode.terminalOptions == null || currentNode.terminalOptions.Length == 0)
+            yield break;
+
+        foreach (var option in currentNode.terminalOptions)
+        {
+            if (option.noun == null)
+                continue;
+
+            var word = option.noun.word;
+            if (word != null && word.ToLowerInvariant() == "confirm")
+            {
+                terminal.LoadNewNode(option.result);
+                Plugin.Log.LogDebug("Auto-confirmed via Ctrl+Enter.");
+                yield break;
+            }
+        }
     }
 }

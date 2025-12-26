@@ -1,42 +1,43 @@
 # TerminalAliases
 
-A Lethal Company mod that lets you define custom terminal command aliases using a simple multiline configuration.
+A Lethal Company mod that lets you define custom terminal command aliases directly from the terminal.
 
 ## Features
 
-- Define aliases in a simple `alias=command` format, one per line
-- Supports arguments: `fl=flash` allows `fl Phil` to expand to `flash Phil`
-- Works with modded commands: `buy=purchase` makes `hotbarplus buy` work as `hotbarplus purchase`
+- **Terminal commands** to add, list, and remove aliases
+- Aliases stored in `BepInEx/config/TerminalAliases.cfg`
+- Supports arguments: `fl` expands to `flash`, so `fl Alberts` becomes `flash Alberts`
 - Case-insensitive matching with case preservation
-- Hot-reload: changes take effect immediately when config is saved
+- **Ctrl+Enter** auto-confirms purchases and actions
 
-## Configuration
+## Terminal Commands
 
-Edit the config file at `BepInEx/config/TerminalAliases.cfg`:
+| Command | Description |
+|---------|-------------|
+| `alias` | List all defined aliases |
+| `alias [name] [command]` | Create or update an alias |
+| `removealias [name]` | Remove an alias |
 
-```ini
-[Aliases]
-Definitions = vm=view monitor
-sh=switch
-sc=scan
-st=store
-m=moons
-fl=flash
-buy=purchase
+## Usage Examples
+
+```
+> alias vm view monitor
+Alias 'vm' set to 'view monitor'
+
+> alias fl flash
+Alias 'fl' set to 'flash'
+
+> alias
+Defined aliases:
+  vm = view monitor
+  fl = flash
+
+> removealias vm
+Alias 'vm' removed.
 ```
 
-## Examples
+Once defined, typing `fl Alberts` will expand to `flash Alberts`.
 
-| Input | Expands To |
-|-------|------------|
-| `vm` | `view monitor` |
-| `fl Phil` | `flash Phil` |
-| `hotbarplus buy` | `hotbarplus purchase` |
-| `SC` | `SCAN` |
+## Ctrl+Enter
 
-## Installation
-
-1. Install BepInEx 5.x
-2. Place `TerminalAliases.dll` in `BepInEx/plugins/`
-3. Run the game once to generate the config file
-4. Edit the config to add your aliases
+Press **Ctrl+Enter** instead of Enter to automatically confirm purchases and other actions that require typing "confirm".

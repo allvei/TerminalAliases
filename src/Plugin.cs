@@ -1,6 +1,7 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using System.IO;
 using System.Reflection;
 
 namespace TerminalAliases;
@@ -9,13 +10,15 @@ namespace TerminalAliases;
 public class Plugin : BaseUnityPlugin
 {
     internal static ManualLogSource Log { get; private set; } = null!;
-    internal static new PluginConfig Config { get; private set; } = null!;
+    internal static AliasManager AliasManager { get; private set; } = null!;
     internal static Harmony Harmony { get; private set; } = null!;
 
     private void Awake()
     {
         Log = Logger;
-        Config = new PluginConfig(base.Config);
+
+        var configDir = Path.GetDirectoryName(base.Config.ConfigFilePath)!;
+        AliasManager = new AliasManager(configDir);
         
         Harmony = new Harmony(PluginInfo.PLUGIN_GUID);
         Harmony.PatchAll(Assembly.GetExecutingAssembly());

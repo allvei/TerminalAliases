@@ -43,28 +43,39 @@ internal static class TerminalPatch
         Plugin.Log.LogDebug($"Expanded: '{input.Trim()}' -> '{expanded.Trim()}'");
     }
 
+    private const int MaxChainDepth = 10;
+
     private static string ExpandInput(string input)
     {
-        var aliases = Plugin.Config.AliasMap;
+        var aliases = Plugin.AliasManager.Aliases;
         if (aliases.Count == 0)
             return input;
 
-        var words = input.Split(new[] { ' ' }, StringSplitOptions.None);
-        var modified = false;
-
-        for (int i = 0; i < words.Length; i++)
+        var result = input;
+        for (int depth = 0; depth < MaxChainDepth; depth++)
         {
-            var word = words[i];
-            var wordLower = word.ToLowerInvariant();
+            var words = result.Split(new[] { ' ' }, StringSplitOptions.None);
+            var modified = false;
 
-            if (aliases.TryGetValue(wordLower, out var replacement))
+            for (int i = 0; i < words.Length; i++)
             {
-                words[i] = PreserveCase(word, replacement);
-                modified = true;
+                var word = words[i];
+                var wordLower = word.ToLowerInvariant();
+
+                if (aliases.TryGetValue(wordLower, out var replacement))
+                {
+                    words[i] = PreserveCase(word, replacement);
+                    modified = true;
+                }
             }
+
+            if (!modified)
+                break;
+
+            result = string.Join(" ", words);
         }
 
-        return modified ? string.Join(" ", words) : input;
+        return result;
     }
 
     private static string PreserveCase(string original, string replacement)
