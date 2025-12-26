@@ -24,14 +24,14 @@ using Text;
 [assembly: Debuggable(DebuggableAttribute.DebuggingModes.Default | DebuggableAttribute.DebuggingModes.DisableOptimizations | DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints | DebuggableAttribute.DebuggingModes.EnableEditAndContinue)]
 [assembly: TargetFramework(".NETStandard,Version=v2.1", FrameworkDisplayName = ".NET Standard 2.1")]
 [assembly: IgnoresAccessChecksTo("Assembly-CSharp")]
-[assembly: AssemblyCompany("Flav20.AliasPlugin")]
+[assembly: AssemblyCompany("allvei.terminalaliases")]
 [assembly: AssemblyConfiguration("Debug")]
-[assembly: AssemblyFileVersion("1.2.1.0")]
-[assembly: AssemblyInformationalVersion("1.2.1+4f47f829e36a020903897c281d21475dc773ed50")]
+[assembly: AssemblyFileVersion("0.1.0.0")]
+[assembly: AssemblyInformationalVersion("0.1.0+4f47f829e36a020903897c281d21475dc773ed50")]
 [assembly: AssemblyProduct("alias plugin")]
-[assembly: AssemblyTitle("Flav20.AliasPlugin")]
+[assembly: AssemblyTitle("allvei.terminalaliases")]
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
-[assembly: AssemblyVersion("1.2.1.0")]
+[assembly: AssemblyVersion("0.1.0.0")]
 [module: UnverifiableCode]
 [module: RefSafetyRules(11)]
 namespace Microsoft.CodeAnalysis
@@ -173,7 +173,7 @@ namespace Text
 	}
 	internal class init
 	{
-		public static string finishLoaded = "Flav20.AliasPlugin v1.2.1 has loaded!";
+		public static string finishLoaded = "allvei.terminalaliases v0.1.0 has loaded!";
 
 		public static string finishPatch = "Finished patching!";
 	}
@@ -424,7 +424,7 @@ namespace MyMod
 }
 namespace MyFirstMod
 {
-	[BepInPlugin("Flav20.AliasPlugin", "alias plugin", "1.2.1")]
+	[BepInPlugin("allvei.terminalaliases", "alias plugin", "0.1.0")]
 	[BepInDependency(/*Could not decode attribute arguments.*/)]
 	public class AliasPlugin : BaseUnityPlugin
 	{
@@ -455,7 +455,7 @@ namespace MyFirstMod
 			//IL_0018: Expected O, but got Unknown
 			if (Harmony == null)
 			{
-				Harmony = new Harmony("Flav20.AliasPlugin");
+				Harmony = new Harmony("allvei.terminalaliases");
 			}
 			Harmony.PatchAll(typeof(AliasPatch));
 			Logger.LogDebug((object)init.finishPatch);
@@ -472,11 +472,15 @@ namespace MyFirstMod
 	}
 	public static class MyPluginInfo
 	{
-		public const string PLUGIN_GUID = "Flav20.AliasPlugin";
+		public const string PLUGIN_GUID = "com.github.allvei.lethalaliases";
 
 		public const string PLUGIN_NAME = "alias plugin";
 
-		public const string PLUGIN_VERSION = "1.2.1";
+		public const string PLUGIN_VERSION = "0.1.0";
+
+		public const string PLUGIN_WEBSITE = "https://github.com/allvei/TerminalAliases";
+
+		public const string PLUGIN_AUTHOR = "xCape";
 	}
 }
 namespace System.Runtime.CompilerServices
