@@ -1,9 +1,0 @@
-{
-    "name": "TerminalAliases",
-    "version_number": "1.0.0",
-    "website_url": "https://github.com/allvei/TerminalAliases",
-    "description": "Define custom command aliases within the terminal. Supports arguments and works with modded commands.",
-    "dependencies": [
-        "BepInEx-BepInExPack-5.4.2304"
-    ]
-}
