@@ -1,6 +1,7 @@
 bin/
 obj/
 .vs/
+.vscode/
 *.user
 *.suo
 *.cache
@@ -8,3 +9,11 @@ obj/
 *.dll
 !lib/*.dll
 *.zip
+
+# Generated files
+manifest.json
+packages.lock.json
+
+# Local development
+scripts/
+AliasPlugin

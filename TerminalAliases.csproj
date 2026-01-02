@@ -4,7 +4,7 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<AssemblyName>TerminalAliases</AssemblyName>
 		<Product>TerminalAliases</Product>
-		<Version>1.0.0</Version>
+		<Version>1.1.1</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
@@ -12,6 +12,15 @@
 		<GameDir Condition="'$(GameDir)' == ''">$(HOME)/.steam/steam/steamapps/common/Lethal Company</GameDir>
 		<ManagedDir>$(GameDir)/Lethal Company_Data/Managed</ManagedDir>
 		<UseLocalGameLibs Condition="Exists('$(ManagedDir)/Assembly-CSharp.dll')">true</UseLocalGameLibs>
+	</PropertyGroup>
+
+	<!-- Mod manifest info (single source of truth) -->
+	<PropertyGroup>
+		<ModAuthor>xCape</ModAuthor>
+		<ModName>TerminalAliases</ModName>
+		<ModWebsiteUrl>https://github.com/allvei/TerminalAliases</ModWebsiteUrl>
+		<ModDescription>Define custom command aliases within the terminal. Supports arguments and works with modded commands.</ModDescription>
+		<ModDependencies>BepInEx-BepInExPack-5.4.2304</ModDependencies>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -54,4 +63,67 @@
 	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
 	</ItemGroup>
+
+	<!-- r2modman local testing paths -->
+	<PropertyGroup>
+		<R2ModManCache>$(HOME)/.config/r2modmanPlus-local/LethalCompany/cache/xCape-TerminalAliases/$(Version)</R2ModManCache>
+		<R2ModManProfile>$(HOME)/.config/r2modmanPlus-local/LethalCompany/profiles/test/BepInEx/plugins/xCape-TerminalAliases</R2ModManProfile>
+	</PropertyGroup>
+
+	<!-- Validate changelog contains current version (Release only) -->
+	<Target Name="ValidateChangelog" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release'">
+		<ReadLinesFromFile File="$(ProjectDir)CHANGELOG.md">
+			<Output TaskParameter="Lines" ItemName="ChangelogLines" />
+		</ReadLinesFromFile>
+		<PropertyGroup>
+			<ChangelogContent>@(ChangelogLines)</ChangelogContent>
+		</PropertyGroup>
+		<Error Condition="!$(ChangelogContent.Contains('$(Version)'))"
+			Text="CHANGELOG.md does not contain an entry for version $(Version). Please update the changelog before releasing." />
+	</Target>
+
+	<!-- Generate manifest.json from csproj properties -->
+	<Target Name="GenerateManifest" BeforeTargets="Build">
+		<PropertyGroup>
+			<ManifestContent>{
+    "name": "$(ModName)",
+    "version_number": "$(Version)",
+    "website_url": "$(ModWebsiteUrl)",
+    "description": "$(ModDescription)",
+    "dependencies": [
+        "$(ModDependencies)"
+    ]
+}
+</ManifestContent>
+		</PropertyGroup>
+		<WriteLinesToFile File="$(ProjectDir)manifest.json" Lines="$(ManifestContent)" Overwrite="true" />
+	</Target>
+
+	<!-- Package target: build and deploy to r2modman cache + profile -->
+	<Target Name="Package" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+		<MakeDir Directories="$(R2ModManCache)" />
+		<MakeDir Directories="$(R2ModManProfile)" />
+
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(R2ModManCache)" />
+		<Copy SourceFiles="$(ProjectDir)manifest.json" DestinationFolder="$(R2ModManCache)" />
+		<Copy SourceFiles="$(ProjectDir)icon.png" DestinationFolder="$(R2ModManCache)" />
+		<Copy SourceFiles="$(ProjectDir)README.md" DestinationFolder="$(R2ModManCache)" />
+		<Copy SourceFiles="$(ProjectDir)CHANGELOG.md" DestinationFolder="$(R2ModManCache)" />
+		<Copy SourceFiles="$(ProjectDir)LICENSE" DestinationFolder="$(R2ModManCache)" />
+
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(R2ModManProfile)" />
+		<Copy SourceFiles="$(ProjectDir)manifest.json" DestinationFolder="$(R2ModManProfile)" />
+		<Copy SourceFiles="$(ProjectDir)icon.png" DestinationFolder="$(R2ModManProfile)" />
+		<Copy SourceFiles="$(ProjectDir)README.md" DestinationFolder="$(R2ModManProfile)" />
+		<Copy SourceFiles="$(ProjectDir)CHANGELOG.md" DestinationFolder="$(R2ModManProfile)" />
+		<Copy SourceFiles="$(ProjectDir)LICENSE" DestinationFolder="$(R2ModManProfile)" />
+
+		<ZipDirectory SourceDirectory="$(R2ModManCache)" DestinationFile="$(ProjectDir)xCape-TerminalAliases-$(Version).zip" Overwrite="true" />
+
+		<Message Importance="high" Text="Packaged to: $(R2ModManCache)" />
+		<Message Importance="high" Text="Deployed to: $(R2ModManProfile)" />
+		<Message Importance="high" Text="Zip created: $(ProjectDir)xCape-TerminalAliases-$(Version).zip" />
+
+		<Exec Command="$(ProjectDir)scripts/update-modlist.sh '$(ModAuthor)' '$(ModName)' '$(ModWebsiteUrl)' '$(ModDescription)' '$(ModDependencies)' '$(Version)'" />
+	</Target>
 </Project>
